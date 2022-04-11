@@ -1,32 +1,34 @@
 import json
+import os
 import time
 from datetime import datetime as dt
 from threading import Thread
 from urllib import parse
 
 import requests
+from dotenv import load_dotenv
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from .models import Client, Distrib, Message
 
+load_dotenv()
+
 time_format = '%d/%m/%Y %H:%M:%S'
 url = 'https://probe.fbrq.cloud/v1/send/'
-headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey'
-           'JleHAiOjE2ODA5NjMxMjcsImlzcyI6ImZhYnJpcXVlIiwibmFtZSI6Il'
-           'NlcmdleSJ9.omzsjmU-XVjBoOgFnDF0_wFIRn3u4jz4zGatZYTymgo'}
-
+headers = {'Authorization': 'Bearer '+ str(os.getenv('TOKEN1'))
+            + str(os.getenv('TOKEN2')) + str(os.getenv('TOKEN3'))}
 
 def send_message(message, payload):
     try:
         response = requests.post(
             url + str(message.id), headers=headers, data=json.dumps(payload)
         )
+        if response.status_code == 200:
+            message.is_sent = True
+            message.save()
     except Exception:
         pass    # возможны доп. действия в случае неотправки сообщения
-    if response.status_code == 200:
-        message.is_sent = True
-        message.save()
 
 
 def make_distrib(clients, distrib, start_dt, end_dt, delay):
@@ -45,16 +47,17 @@ def make_distrib(clients, distrib, start_dt, end_dt, delay):
                     "text": distrib.text
                 }
                 send_message(message, payload)
-            message = Message.objects.filter(
-                            client=client
-                        ).filter(distrib=distrib)[0]
-            if not message.is_sent:
-                payload = {
-                    "id": message.id,
-                    "phone": int(client.tel_number),
-                    "text": distrib.text
-                }
-                send_message(message, payload)
+            else:
+                message = Message.objects.filter(
+                                client=client
+                         ).filter(distrib=distrib)[0]
+                if not message.is_sent:
+                    payload = {
+                        "id": message.id,
+                        "phone": int(client.tel_number),
+                        "text": distrib.text
+                    }
+                    send_message(message, payload)
 
 class ClientSerializer(serializers.ModelSerializer):
 
