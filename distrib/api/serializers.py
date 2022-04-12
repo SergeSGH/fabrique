@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from .models import Client, Distrib, Message
+from .models import Client, Distrib, Message, User
 
 load_dotenv()
 
@@ -18,6 +18,23 @@ time_format = '%d/%m/%Y %H:%M:%S'
 url = 'https://probe.fbrq.cloud/v1/send/'
 headers = {'Authorization': 'Bearer '+ str(os.getenv('TOKEN1'))
             + str(os.getenv('TOKEN2')) + str(os.getenv('TOKEN3'))}
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        extra_kwargs = {'password': {'write_only': True}}
+        fields = (
+            'id',
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'password'
+        )
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
 
 def send_message(message, payload):
     try:

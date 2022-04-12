@@ -2,16 +2,23 @@ from datetime import datetime as dt
 from urllib import parse
 
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .filters import ClientFilter
-from .models import Client, Distrib
+from .models import Client, Distrib, User
 from .serializers import (ClientSerializer, DistribCreateSerializer,
                           DistribDetailSerializer, DistribListSerializer,
+                          UserSerializer,
                           make_distrib, time_format)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (permissions.AllowAny,)
 
 
 class ClientViewSet(

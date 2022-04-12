@@ -14,6 +14,8 @@ import os
 
 from dotenv import load_dotenv
 
+from django.contrib.auth import get_user_model
+
 load_dotenv()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -44,7 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'api.apps.ApiConfig',
-    'background_task',
+    'drf_yasg'
 ]
 
 
@@ -101,7 +103,6 @@ DATABASES = {
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
