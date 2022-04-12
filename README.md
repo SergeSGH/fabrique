@@ -10,7 +10,7 @@
 git clone https://github.com/SergeSGH/fabrique.git
 ```
 ```
-cd fabrique/distib
+cd fabrique/distrib
 ```
 
 В папке проекта создать файл .env в котором определить ключевые переменные:
